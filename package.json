@@ -1,0 +1,27 @@
+{
+  "name": "tristack-alpha-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dry-run-first BNB Chain AI trading agent for CMC signals, Trust Wallet guards, BNBAgent identity, and Aave flash-loan pool-balancing simulations.",
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "lint": "pnpm -r --if-present lint && pnpm bnb:lint",
+    "test": "pnpm -r --if-present test && pnpm bnb:test",
+    "dev": "pnpm --filter @tristack/agent dev",
+    "demo:dry-run": "pnpm --filter @tristack/agent demo:dry-run",
+    "demo:replay": "pnpm --filter @tristack/agent demo:replay",
+    "agent:run": "pnpm --filter @tristack/agent start",
+    "web:dev": "pnpm --filter @tristack/web dev",
+    "contracts:test": "pnpm --filter @tristack/contracts test",
+    "bnb:test": "python3 -m unittest discover services/bnb-agent/tests",
+    "bnb:lint": "python3 -m py_compile services/bnb-agent/*.py services/bnb-agent/tests/*.py"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "pnpm": "9.15.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

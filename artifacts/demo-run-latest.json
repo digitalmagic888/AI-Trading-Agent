@@ -1,0 +1,224 @@
+{
+  "generatedAt": "2026-06-03T16:45:18.295Z",
+  "mode": "testnet",
+  "cmc": {
+    "mode": "mock",
+    "skills": [
+      {
+        "uniqueName": "btc_cross_asset_correlation",
+        "title": "BTC Cross Asset Correlation",
+        "description": "Preview of BTC correlation stress, major asset beta, and market risk context.",
+        "source": "mock"
+      },
+      {
+        "uniqueName": "crypto_macro_overview",
+        "title": "Crypto Macro Overview",
+        "description": "Broad market regime overview for crypto majors and liquidity conditions.",
+        "source": "mock"
+      }
+    ],
+    "selectedSkill": {
+      "uniqueName": "btc_cross_asset_correlation",
+      "title": "BTC Cross Asset Correlation",
+      "description": "Preview of BTC correlation stress, major asset beta, and market risk context.",
+      "source": "mock"
+    },
+    "skillResult": {
+      "uniqueName": "btc_cross_asset_correlation",
+      "ok": true,
+      "raw": {
+        "preview": true,
+        "market": "BNB Chain liquidity remains active while BTC correlation risk is moderate.",
+        "regime": "neutral",
+        "confidence": 72,
+        "volatility": "medium",
+        "invalidation": [
+          "BTC downside break with rising realized volatility",
+          "DEX quotes older than 45 seconds"
+        ],
+        "universe": [
+          "WBNB",
+          "USDT",
+          "USDC",
+          "CAKE",
+          "TWT"
+        ],
+        "notes": [
+          "Mock CMC Skill Hub result because native MCP is not configured in this shell."
+        ]
+      }
+    }
+  },
+  "flashLoan": {
+    "provider": "Aave V3 on BNB Chain",
+    "executionEnabled": false,
+    "route": {
+      "id": "opp_a52d1a1d6521560d",
+      "chain": "bnb",
+      "borrowAsset": "USDT",
+      "amountUsd": 10000,
+      "buyDex": "PancakeSwap",
+      "sellDex": "Biswap",
+      "buyPrice": 600,
+      "sellPrice": 606.8,
+      "grossSpreadBps": 113.3333,
+      "dexFeeBps": 45,
+      "flashLoanPremiumBps": 9,
+      "slippageBps": 45.4545,
+      "gasCostUsd": 3.5,
+      "expectedProfitUsd": 10.3788,
+      "expectedProfitBps": 10.3788,
+      "isProfitable": true,
+      "stale": false,
+      "notes": [
+        "Borrow USDT, buy WBNB on PancakeSwap, sell on Biswap.",
+        "Gross spread 113.33 bps; cost estimate 99.45 bps plus $3.50 gas.",
+        "Quotes are within freshness window."
+      ]
+    }
+  },
+  "trustWallet": {
+    "mode": "mock",
+    "plan": {
+      "command": "twak",
+      "args": [
+        "swap",
+        "10000",
+        "USDT",
+        "WBNB",
+        "--chain",
+        "bnb",
+        "--quote-only",
+        "--json"
+      ],
+      "safeToRun": true
+    },
+    "status": "not-run",
+    "reason": "TWAK credentials are not required for dry-run demo."
+  },
+  "decision": {
+    "runId": "flash_dfdd9697-774e-4940-b8a6-4d1e685df838",
+    "timestamp": "2026-06-03T16:45:18.286Z",
+    "type": "EXECUTE_FLASH_ROUTE_BLOCKED",
+    "confidence": 60,
+    "reason": "Profitable dry-run route found, but execution is blocked: Trade notional cap: amountUsd=10000, maxTradeUsd=0; Daily notional cap: amountUsd=10000, maxDailyNotionalUsd=0; Kill switch: kill switch enabled.",
+    "finalAction": "quote_only",
+    "signal": {
+      "timestamp": "2026-06-03T16:45:18.282Z",
+      "skillName": "btc_cross_asset_correlation",
+      "rawResultHash": "3fc2ae0812ad6fa8bb0460fb95d03b9148a8f397798418233536770048a27c31",
+      "normalizedMarketRegime": "neutral",
+      "confidenceScore": 72,
+      "volatilityRiskNotes": [
+        "No severe volatility flag in normalized CMC result.",
+        "Flash-route sizing remains bounded by quote depth and configured notional caps."
+      ],
+      "invalidationCriteria": [
+        "Quote age exceeds configured staleness limit.",
+        "Gross spread falls below flash premium, DEX fees, slippage, and gas.",
+        "CMC regime confidence falls below threshold."
+      ],
+      "recommendedUniverse": [
+        "WBNB",
+        "USDT",
+        "USDC",
+        "CAKE",
+        "TWT"
+      ],
+      "noTradeReasons": []
+    },
+    "opportunity": {
+      "id": "opp_a52d1a1d6521560d",
+      "chain": "bnb",
+      "borrowAsset": "USDT",
+      "amountUsd": 10000,
+      "buyDex": "PancakeSwap",
+      "sellDex": "Biswap",
+      "buyPrice": 600,
+      "sellPrice": 606.8,
+      "grossSpreadBps": 113.3333,
+      "dexFeeBps": 45,
+      "flashLoanPremiumBps": 9,
+      "slippageBps": 45.4545,
+      "gasCostUsd": 3.5,
+      "expectedProfitUsd": 10.3788,
+      "expectedProfitBps": 10.3788,
+      "isProfitable": true,
+      "stale": false,
+      "notes": [
+        "Borrow USDT, buy WBNB on PancakeSwap, sell on Biswap.",
+        "Gross spread 113.33 bps; cost estimate 99.45 bps plus $3.50 gas.",
+        "Quotes are within freshness window."
+      ]
+    },
+    "gates": [
+      {
+        "name": "CMC confidence threshold",
+        "passed": true,
+        "detail": "confidence=72, threshold=65",
+        "severity": "blocker"
+      },
+      {
+        "name": "Opportunity is profitable after costs",
+        "passed": true,
+        "detail": "expectedProfitUsd=10.3788",
+        "severity": "blocker"
+      },
+      {
+        "name": "Quote freshness",
+        "passed": true,
+        "detail": "stalenessLimitMs=45000",
+        "severity": "blocker"
+      },
+      {
+        "name": "Chain allowlist",
+        "passed": true,
+        "detail": "chain=bnb",
+        "severity": "blocker"
+      },
+      {
+        "name": "Token allowlist",
+        "passed": true,
+        "detail": "tokens=USDT,WBNB,USDT",
+        "severity": "blocker"
+      },
+      {
+        "name": "Trade notional cap",
+        "passed": false,
+        "detail": "amountUsd=10000, maxTradeUsd=0",
+        "severity": "blocker"
+      },
+      {
+        "name": "Daily notional cap",
+        "passed": false,
+        "detail": "amountUsd=10000, maxDailyNotionalUsd=0",
+        "severity": "blocker"
+      },
+      {
+        "name": "Kill switch",
+        "passed": false,
+        "detail": "kill switch enabled",
+        "severity": "blocker"
+      },
+      {
+        "name": "Live trading flag",
+        "passed": false,
+        "detail": "LIVE_TRADING=false",
+        "severity": "blocker"
+      },
+      {
+        "name": "Flash-loan execution flag",
+        "passed": false,
+        "detail": "FLASH_LOAN_EXECUTION=false",
+        "severity": "blocker"
+      }
+    ],
+    "decisionHash": "09fa66a656eedad0cb9d8eca2d42c5fcb57a9d4171ca0d50aef7d545c1b7ba92"
+  },
+  "safety": {
+    "liveTrading": false,
+    "killSwitch": true,
+    "maxTradeUsd": 0,
+    "statement": "No transaction was signed, broadcast, or executed."
+  }
+}

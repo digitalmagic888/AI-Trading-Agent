@@ -1,0 +1,16 @@
+{
+  "name": "@tristack/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "demo:dry-run": "tsx src/demo/dryRun.ts",
+    "demo:replay": "tsx src/demo/replay.ts",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,13 @@
+[project]
+name = "tristack-bnb-agent"
+version = "0.1.0"
+description = "Dry-run BNBAgent identity service for TriStack Alpha Agent"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+server = ["uvicorn>=0.30"]
+bnbagent = ["bnbagent"]
+
+[tool.setuptools]
+py-modules = ["agent_server", "manifest", "register_agent"]

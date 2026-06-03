@@ -1,0 +1,53 @@
+# dependencies
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+dist/
+build/
+coverage/
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.secret
+secrets/
+.twa*/
+.twak/
+.codex/
+claude_desktop_config.json
+config.toml
+
+# wallets / chain secrets
+wallet.json
+wallets/
+private-key*
+mnemonic*
+seed*
+keystore/
+*.sqlite-secret
+
+# local db / runtime
+*.db
+*.sqlite
+*.sqlite3
+logs/
+tmp/
+.cache/
+
+# artifacts that may contain sensitive runtime data
+artifacts/private/
+artifacts/secrets/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/settings.json
