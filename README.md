@@ -68,6 +68,19 @@ python register_agent.py --dry-run
 uvicorn agent_server:app --port 8003
 ```
 
+
+## Cloudflare Pages
+
+For a standard Cloudflare Pages Vite deployment from the monorepo root:
+
+```text
+Build command: npm run build
+Build output directory: apps/web/dist
+Root directory: /
+```
+
+The root `build` script delegates to `@tristack/web`, so Cloudflare's default `npm run build` works without changing the monorepo layout.
+
 ## Environment variables
 
 Copy `.env.example` to `.env` for local runs. Keep real values out of Git.

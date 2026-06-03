@@ -15,7 +15,9 @@
     "web:dev": "pnpm --filter @tristack/web dev",
     "contracts:test": "pnpm --filter @tristack/contracts test",
     "bnb:test": "python3 -m unittest discover services/bnb-agent/tests",
-    "bnb:lint": "python3 -m py_compile services/bnb-agent/*.py services/bnb-agent/tests/*.py"
+    "bnb:lint": "python3 -m py_compile services/bnb-agent/*.py services/bnb-agent/tests/*.py",
+    "build": "pnpm --filter @tristack/web build",
+    "pages:build": "pnpm --filter @tristack/web build"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",
