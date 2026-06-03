@@ -2,13 +2,13 @@
 
 AI flash-liquidity pool balancing for BNB Chain, dry-run first.
 
-TriStack Alpha Agent is a self-custody AI trading agent for BNB Chain. It uses CoinMarketCap Skill Hub as the signal layer, Trust Wallet Agent Kit as the local custody and execution guard, BNBAgent SDK as the on-chain identity / commerce layer, and Aave V3 as the modeled flash-liquidity source. The agent is dry-run by default, records every decision, and refuses execution unless market signal, token safety, quote quality, wallet state, and user-defined risk rules all pass.
+TriStack Alpha Agent is a self-custody AI trading agent for BNB Chain. It uses CoinMarketCap MCP as the signal layer, Trust Wallet Agent Kit as the local custody and execution guard, BNBAgent SDK as the on-chain identity / commerce layer, and Aave V3 as the modeled flash-liquidity source. The agent is dry-run by default, records every decision, and refuses execution unless market signal, token safety, quote quality, wallet state, and user-defined risk rules all pass.
 
 Built by digitalmagic888 / OGWEBCHEF888
 
 ## 60-second explanation
 
-Cross-DEX price differences on BNB Chain can exist for short windows. TriStack Alpha Agent treats those windows as pool-balancing opportunities, not investment advice. It discovers market context from CMC Skill Hub, compares BNB DEX quotes, estimates Aave V3 flash-loan premium, DEX fees, slippage, gas, and stale-quote risk, then records a deterministic decision hash. Trust Wallet Agent Kit is the execution boundary: wallet checks, token risk checks, and quote-only swaps happen before any live path. BNBAgent SDK provides the agent identity and service manifest.
+Cross-DEX price differences on BNB Chain can exist for short windows. TriStack Alpha Agent treats those windows as pool-balancing opportunities, not investment advice. It discovers market context from CMC MCP, compares BNB DEX quotes, estimates Aave V3 flash-loan premium, DEX fees, slippage, gas, and stale-quote risk, then records a deterministic decision hash. Trust Wallet Agent Kit is the execution boundary: wallet checks, token risk checks, and quote-only swaps happen before any live path. BNBAgent SDK provides the agent identity and service manifest.
 
 The shipped MVP demonstrates the complete decision loop in dry-run mode. No transaction is signed, broadcast, deployed, or executed by default.
 
@@ -16,7 +16,7 @@ The shipped MVP demonstrates the complete decision loop in dry-run mode. No tran
 
 | Stack | Role | Current implementation |
 | --- | --- | --- |
-| CoinMarketCap Skill Hub | Market signal and skill discovery | Mock/file adapter plus real-mode MCP instructions for `find_skill` and `execute_skill` |
+| CoinMarketCap MCP | Market signal and skill discovery | Mock/file adapter plus real-mode MCP instructions for `search_cryptos`, `get_crypto_quotes_latest`, and `get_global_metrics_latest` |
 | Trust Wallet Agent Kit | Self-custody wallet and quote guard | TWAK command builder for auth, wallet, risk, portfolio, and quote-only swaps |
 | BNBAgent SDK | Agent identity and commerce endpoint | Python manifest service with `/agent/manifest` and `/erc8183/status` |
 | BNB Chain | Venue and testnet identity target | BSC-focused config, allowlists, and docs |
@@ -26,7 +26,7 @@ The shipped MVP demonstrates the complete decision loop in dry-run mode. No tran
 
 ```mermaid
 flowchart LR
-  CMC[CMC Skill Hub] --> Signal[Signal Snapshot]
+  CMC[CMC MCP] --> Signal[Signal Snapshot]
   Signal --> Engine[Strategy and Risk Engine]
   DEX[BNB DEX Quotes] --> Flash[Flash Opportunity Engine]
   Aave[Aave V3 Flash Loan Model] --> Flash
@@ -96,7 +96,7 @@ Copy `.env.example` to `.env` for local runs. Keep real values out of Git.
 
 ## Mocked or manual in this MVP
 
-- Native CMC Skill Hub MCP verification requires local Codex MCP config and a rotated `CMC_MCP_API_KEY`.
+- Live CMC MCP verification requires local Codex MCP config or `CMC_MCP_API_KEY`, using `https://mcp.coinmarketcap.com/mcp`.
 - TWAK real wallet/risk/quote calls require Trust Wallet credentials outside the repo.
 - Aave flash-loan execution contract is not deployed automatically.
 - BNBAgent on-chain registration is dry-run unless wallet/RPC configuration is supplied intentionally.

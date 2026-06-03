@@ -6,7 +6,7 @@ export function SignalPanel() {
     <section className="band">
       <div className="section-head"><Brain size={18} /> <h2>Signal Brain</h2></div>
       <div className="grid-3">
-        <Metric label="Source" value="CMC Skill Hub" tone="good" />
+        <Metric label="Source" value="CMC MCP" tone="good" />
         <Metric label="Regime" value="Neutral liquidity" />
         <Metric label="Confidence" value="72 / 100" />
       </div>

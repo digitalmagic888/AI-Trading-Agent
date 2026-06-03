@@ -16,7 +16,7 @@ export async function fetchSponsorProof(): Promise<SponsorProof> {
     return await response.json() as SponsorProof;
   } catch {
     return {
-      cmc: "Mock CMC Skill Hub signal is wired; real mode waits for local MCP config.",
+      cmc: "Mock CMC MCP signal is wired; real mode waits for local MCP config.",
       trustWallet: "TWAK quote-only command wrapper is dry-run-safe.",
       bnbAgent: "Manifest service is available in dry-run mode.",
       aave: "Aave V3 flash-loan route simulation is modeled before any contract execution.",

@@ -45,6 +45,7 @@ export function loadConfig(overrides: Partial<RuntimeConfig> = {}): RuntimeConfi
     dbPath: process.env.AGENT_DB_PATH || path.join(repoRoot, "artifacts", "agent-ledger.sqlite3"),
     cmcMode: (process.env.CMC_MODE as RuntimeConfig["cmcMode"]) || "mock",
     cmcSkillResultsFile: process.env.CMC_SKILL_RESULTS_FILE || undefined,
+    cmcMcpUrl: process.env.CMC_MCP_URL || "https://mcp.coinmarketcap.com/mcp",
     twakMode: (process.env.TWAK_MODE as RuntimeConfig["twakMode"]) || "mock"
   };
   return { ...config, ...overrides };

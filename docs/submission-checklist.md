@@ -1,6 +1,6 @@
 # Submission Checklist
 
-- [ ] Set local rotated `CMC_MCP_API_KEY` and configure `cmc-skill-hub` MCP.
+- [ ] Set `CMC_MCP_API_KEY` and configure `cmc-mcp` at `https://mcp.coinmarketcap.com/mcp`.
 - [ ] Run `pnpm install`.
 - [ ] Run `pnpm lint`.
 - [ ] Run `pnpm test`.

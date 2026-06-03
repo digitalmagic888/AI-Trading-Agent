@@ -1,33 +1,39 @@
 {
-  "generatedAt": "2026-06-03T16:45:18.295Z",
+  "generatedAt": "2026-06-03T19:29:44.937Z",
   "mode": "testnet",
   "cmc": {
     "mode": "mock",
     "skills": [
       {
-        "uniqueName": "btc_cross_asset_correlation",
-        "title": "BTC Cross Asset Correlation",
-        "description": "Preview of BTC correlation stress, major asset beta, and market risk context.",
-        "source": "mock"
+        "uniqueName": "cmc-mcp:search_cryptos",
+        "title": "CMC MCP Crypto Search",
+        "description": "Search CoinMarketCap assets by symbol, name, or slug before requesting market data.",
+        "source": "cmc-mcp"
       },
       {
-        "uniqueName": "crypto_macro_overview",
-        "title": "Crypto Macro Overview",
-        "description": "Broad market regime overview for crypto majors and liquidity conditions.",
-        "source": "mock"
+        "uniqueName": "cmc-mcp:get_crypto_quotes_latest",
+        "title": "CMC MCP Latest Quotes",
+        "description": "Latest CMC quote data for BTC, BNB, and other assets used by the strategy engine.",
+        "source": "cmc-mcp"
       }
     ],
     "selectedSkill": {
-      "uniqueName": "btc_cross_asset_correlation",
-      "title": "BTC Cross Asset Correlation",
-      "description": "Preview of BTC correlation stress, major asset beta, and market risk context.",
-      "source": "mock"
+      "uniqueName": "cmc-mcp:search_cryptos",
+      "title": "CMC MCP Crypto Search",
+      "description": "Search CoinMarketCap assets by symbol, name, or slug before requesting market data.",
+      "source": "cmc-mcp"
     },
     "skillResult": {
-      "uniqueName": "btc_cross_asset_correlation",
+      "uniqueName": "cmc-mcp:search_cryptos",
       "ok": true,
       "raw": {
         "preview": true,
+        "provider": "CoinMarketCap default MCP",
+        "tools": [
+          "search_cryptos",
+          "get_crypto_quotes_latest",
+          "get_global_metrics_latest"
+        ],
         "market": "BNB Chain liquidity remains active while BTC correlation risk is moderate.",
         "regime": "neutral",
         "confidence": 72,
@@ -44,7 +50,7 @@
           "TWT"
         ],
         "notes": [
-          "Mock CMC Skill Hub result because native MCP is not configured in this shell."
+          "Mock CMC MCP result. Set CMC_MODE=real and CMC_MCP_API_KEY outside the repo for live CMC MCP calls."
         ]
       }
     }
@@ -53,7 +59,7 @@
     "provider": "Aave V3 on BNB Chain",
     "executionEnabled": false,
     "route": {
-      "id": "opp_a52d1a1d6521560d",
+      "id": "opp_e872eda87992da2e",
       "chain": "bnb",
       "borrowAsset": "USDT",
       "amountUsd": 10000,
@@ -97,16 +103,16 @@
     "reason": "TWAK credentials are not required for dry-run demo."
   },
   "decision": {
-    "runId": "flash_dfdd9697-774e-4940-b8a6-4d1e685df838",
-    "timestamp": "2026-06-03T16:45:18.286Z",
+    "runId": "flash_d55f4b51-a122-45aa-8a08-5590b0cae184",
+    "timestamp": "2026-06-03T19:29:44.921Z",
     "type": "EXECUTE_FLASH_ROUTE_BLOCKED",
     "confidence": 60,
     "reason": "Profitable dry-run route found, but execution is blocked: Trade notional cap: amountUsd=10000, maxTradeUsd=0; Daily notional cap: amountUsd=10000, maxDailyNotionalUsd=0; Kill switch: kill switch enabled.",
     "finalAction": "quote_only",
     "signal": {
-      "timestamp": "2026-06-03T16:45:18.282Z",
-      "skillName": "btc_cross_asset_correlation",
-      "rawResultHash": "3fc2ae0812ad6fa8bb0460fb95d03b9148a8f397798418233536770048a27c31",
+      "timestamp": "2026-06-03T19:29:44.914Z",
+      "skillName": "cmc-mcp:search_cryptos",
+      "rawResultHash": "0f87cd34b78942a4a0ff73f0f5029426c6365f79d18ceba4e867f4cf2ceca313",
       "normalizedMarketRegime": "neutral",
       "confidenceScore": 72,
       "volatilityRiskNotes": [
@@ -128,7 +134,7 @@
       "noTradeReasons": []
     },
     "opportunity": {
-      "id": "opp_a52d1a1d6521560d",
+      "id": "opp_e872eda87992da2e",
       "chain": "bnb",
       "borrowAsset": "USDT",
       "amountUsd": 10000,
@@ -213,7 +219,7 @@
         "severity": "blocker"
       }
     ],
-    "decisionHash": "09fa66a656eedad0cb9d8eca2d42c5fcb57a9d4171ca0d50aef7d545c1b7ba92"
+    "decisionHash": "a583b80ce548218bc68590f8756350ee658e380d067c2b84e6838813333478f2"
   },
   "safety": {
     "liveTrading": false,

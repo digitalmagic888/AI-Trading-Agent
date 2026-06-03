@@ -23,6 +23,7 @@ export interface RuntimeConfig {
   dbPath: string;
   cmcMode: "mock" | "file" | "real";
   cmcSkillResultsFile?: string;
+  cmcMcpUrl: string;
   twakMode: "mock" | "real";
 }
 
@@ -30,7 +31,7 @@ export interface SkillCandidate {
   uniqueName: string;
   title: string;
   description: string;
-  source: "cmc-skill-hub" | "mock";
+  source: "cmc-mcp" | "mock";
 }
 
 export interface SkillExecutionResult {

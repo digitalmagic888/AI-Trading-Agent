@@ -4,7 +4,7 @@ TriStack Alpha Agent is organized as a dry-run-first decision pipeline.
 
 ```mermaid
 sequenceDiagram
-  participant CMC as CMC Skill Hub
+  participant CMC as CMC MCP
   participant API as Agent API
   participant Flash as Flash Opportunity Engine
   participant TWAK as Trust Wallet Guard
@@ -12,7 +12,7 @@ sequenceDiagram
   participant BNB as BNBAgent Service
   participant UI as Dashboard
 
-  API->>CMC: find_skill and execute_skill preview
+  API->>CMC: search_cryptos, latest quotes, and global metrics
   CMC-->>API: market context
   API->>Flash: BNB DEX quotes plus Aave premium model
   Flash-->>API: expected profit/loss and route notes

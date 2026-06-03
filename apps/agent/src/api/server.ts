@@ -34,7 +34,7 @@ export function createAgentServer() {
       if (req.method === "GET" && url.pathname === "/health") return sendJson(res, 200, { ok: true, service: "tristack-alpha-agent" });
       if (req.method === "GET" && url.pathname === "/api/sponsor-proof") {
         return sendJson(res, 200, {
-          cmc: "Skill Hub adapter with mock/file mode and native Codex MCP real-mode instructions.",
+          cmc: "CMC MCP adapter with mock/file mode and real HTTP MCP mode.",
           trustWallet: "TWAK command wrapper for wallet, risk, portfolio, and quote-only flows.",
           bnbAgent: "Python service exposes manifest and ERC-8183-style status endpoint.",
           aave: "Flash-loan opportunity engine and Solidity proof receiver are dry-run-first.",
