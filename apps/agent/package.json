@@ -12,6 +12,8 @@
     "wallet:fund-hot": "tsx src/live/fundHotWallet.ts",
     "worker:once": "tsx src/live/executionWorker.ts --once",
     "worker:run": "tsx src/live/executionWorker.ts",
+    "broadcast:oneshot": "tsx src/live/broadcastOneShot.ts",
+    "broadcast:disable": "tsx src/live/disableBroadcast.ts",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },

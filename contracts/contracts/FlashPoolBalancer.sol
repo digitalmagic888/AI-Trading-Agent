@@ -3,8 +3,6 @@ pragma solidity ^0.8.24;
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transfer(address to, uint256 amount) external returns (bool);
 }
 
 interface IAavePool {
@@ -46,7 +44,7 @@ contract FlashPoolBalancer {
     error UnauthorizedPoolCaller();
     error InvalidInitiator();
     error UnprofitableRoute(uint256 balance, uint256 requiredBalance);
-    error ApprovalFailed();
+    error ApprovalFailed(address token, address spender, uint256 amount);
 
     struct RoutePlan {
         address executor;
@@ -126,19 +124,24 @@ contract FlashPoolBalancer {
         RoutePlan memory plan = abi.decode(params, (RoutePlan));
         _validateRoute(asset, plan);
 
+        _safeApprove(asset, plan.executor, 0);
+        _safeApprove(asset, plan.executor, amount);
         uint256 reportedFinalBalance = IFlashRouteExecutor(plan.executor).executeRoute(asset, amount, premium, plan.routeData);
+        _safeApprove(asset, plan.executor, 0);
+
         uint256 actualFinalBalance = IERC20(asset).balanceOf(address(this));
         uint256 requiredBalance = amount + premium + plan.minProfit;
         if (actualFinalBalance < requiredBalance) revert UnprofitableRoute(actualFinalBalance, requiredBalance);
 
-        if (!IERC20(asset).approve(address(pool), amount + premium)) revert ApprovalFailed();
+        _safeApprove(asset, address(pool), 0);
+        _safeApprove(asset, address(pool), amount + premium);
         emit RouteSettled(plan.routeHash, asset, amount, premium, actualFinalBalance - amount - premium, reportedFinalBalance, actualFinalBalance);
         return true;
     }
 
     function rescueToken(address token, address to, uint256 amount) external onlyAdmin {
         if (token == address(0) || to == address(0)) revert InvalidAddress();
-        IERC20(token).transfer(to, amount);
+        _safeTransfer(token, to, amount);
     }
 
     function _validateRoute(address asset, RoutePlan memory plan) internal view {
@@ -146,5 +149,15 @@ contract FlashPoolBalancer {
         if (!executorAllowlist[plan.executor]) revert ExecutorNotAllowed(plan.executor);
         if (plan.deadline < block.timestamp) revert DeadlineExpired(plan.deadline, block.timestamp);
         if (plan.routeHash == bytes32(0)) revert InvalidRouteHash();
+    }
+
+    function _safeApprove(address token, address spender, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(abi.encodeWithSelector(0x095ea7b3, spender, amount));
+        if (!ok || (data.length != 0 && !abi.decode(data, (bool)))) revert ApprovalFailed(token, spender, amount);
+    }
+
+    function _safeTransfer(address token, address to, uint256 amount) internal {
+        (bool ok, bytes memory data) = token.call(abi.encodeWithSelector(0xa9059cbb, to, amount));
+        if (!ok || (data.length != 0 && !abi.decode(data, (bool)))) revert InvalidAddress();
     }
 }

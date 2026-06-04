@@ -30,6 +30,11 @@ export function loadDotEnv(filePath = envPath): Record<string, string> {
   return env;
 }
 
+function formatEnvValue(value: string): string {
+  if (/^[A-Za-z0-9_./:@,=+\-]*$/.test(value)) return value;
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
 export function updateDotEnv(updates: Record<string, string>, filePath = envPath): void {
   const existingText = fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : "";
   const lines = existingText.split(/\r?\n/);
@@ -39,10 +44,10 @@ export function updateDotEnv(updates: Record<string, string>, filePath = envPath
     const key = line.slice(0, line.indexOf("=")).trim();
     if (!(key in updates)) return line;
     seen.add(key);
-    return `${key}=${updates[key]}`;
+    return `${key}=${formatEnvValue(updates[key] ?? "")}`;
   });
   for (const [key, value] of Object.entries(updates)) {
-    if (!seen.has(key)) output.push(`${key}=${value}`);
+    if (!seen.has(key)) output.push(`${key}=${formatEnvValue(value)}`);
   }
   fs.writeFileSync(filePath, `${output.filter((line, index) => line.length > 0 || index < output.length - 1).join("\n").trimEnd()}\n`);
   fs.chmodSync(filePath, 0o600);
