@@ -12,20 +12,37 @@ interface IAavePool {
 }
 
 interface IFlashRouteExecutor {
-    function executeRoute(address asset, uint256 amount, uint256 premium, bytes calldata routeData) external returns (uint256 finalBalance);
+    function executeRoute(address asset, uint256 amount, uint256 premium, bytes calldata routeData) external returns (uint256 reportedFinalBalance);
 }
 
 contract FlashPoolBalancer {
     IAavePool public immutable pool;
-    address public owner;
+    address public admin;
+    address public operator;
     bool public flashExecutionEnabled;
+    bool public paused;
 
+    mapping(address => bool) public assetAllowlist;
+    mapping(address => bool) public executorAllowlist;
+
+    event AdminTransferred(address indexed previousAdmin, address indexed newAdmin);
+    event OperatorUpdated(address indexed previousOperator, address indexed newOperator);
     event FlashExecutionEnabled(bool enabled);
-    event RouteRequested(address indexed asset, uint256 amount, uint256 minProfit);
-    event RouteSettled(address indexed asset, uint256 amount, uint256 premium, uint256 profit);
+    event PauseUpdated(bool paused);
+    event AssetAllowlistUpdated(address indexed asset, bool allowed);
+    event ExecutorAllowlistUpdated(address indexed executor, bool allowed);
+    event RouteRequested(bytes32 indexed routeHash, address indexed asset, uint256 amount, uint256 minProfit, address executor, address operator);
+    event RouteSettled(bytes32 indexed routeHash, address indexed asset, uint256 amount, uint256 premium, uint256 profit, uint256 reportedFinalBalance, uint256 actualFinalBalance);
 
-    error NotOwner();
+    error NotAdmin();
+    error NotOperator();
+    error InvalidAddress();
     error FlashExecutionDisabled();
+    error Paused();
+    error AssetNotAllowed(address asset);
+    error ExecutorNotAllowed(address executor);
+    error DeadlineExpired(uint256 deadline, uint256 timestamp);
+    error InvalidRouteHash();
     error UnauthorizedPoolCaller();
     error InvalidInitiator();
     error UnprofitableRoute(uint256 balance, uint256 requiredBalance);
@@ -34,27 +51,71 @@ contract FlashPoolBalancer {
     struct RoutePlan {
         address executor;
         uint256 minProfit;
+        uint256 deadline;
+        bytes32 routeHash;
         bytes routeData;
     }
 
-    constructor(address aavePool) {
+    constructor(address aavePool, address initialOperator) {
+        if (aavePool == address(0) || initialOperator == address(0)) revert InvalidAddress();
         pool = IAavePool(aavePool);
-        owner = msg.sender;
+        admin = msg.sender;
+        operator = initialOperator;
     }
 
-    modifier onlyOwner() {
-        if (msg.sender != owner) revert NotOwner();
+    modifier onlyAdmin() {
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
 
-    function setFlashExecutionEnabled(bool enabled) external onlyOwner {
+    modifier onlyOperator() {
+        if (msg.sender != operator) revert NotOperator();
+        _;
+    }
+
+    modifier whenActive() {
+        if (paused) revert Paused();
+        if (!flashExecutionEnabled) revert FlashExecutionDisabled();
+        _;
+    }
+
+    function transferAdmin(address newAdmin) external onlyAdmin {
+        if (newAdmin == address(0)) revert InvalidAddress();
+        emit AdminTransferred(admin, newAdmin);
+        admin = newAdmin;
+    }
+
+    function setOperator(address newOperator) external onlyAdmin {
+        if (newOperator == address(0)) revert InvalidAddress();
+        emit OperatorUpdated(operator, newOperator);
+        operator = newOperator;
+    }
+
+    function setFlashExecutionEnabled(bool enabled) external onlyAdmin {
         flashExecutionEnabled = enabled;
         emit FlashExecutionEnabled(enabled);
     }
 
-    function requestFlashRoute(address asset, uint256 amount, RoutePlan calldata plan) external onlyOwner {
-        if (!flashExecutionEnabled) revert FlashExecutionDisabled();
-        emit RouteRequested(asset, amount, plan.minProfit);
+    function setPaused(bool value) external onlyAdmin {
+        paused = value;
+        emit PauseUpdated(value);
+    }
+
+    function setAssetAllowed(address asset, bool allowed) external onlyAdmin {
+        if (asset == address(0)) revert InvalidAddress();
+        assetAllowlist[asset] = allowed;
+        emit AssetAllowlistUpdated(asset, allowed);
+    }
+
+    function setExecutorAllowed(address executor, bool allowed) external onlyAdmin {
+        if (executor == address(0)) revert InvalidAddress();
+        executorAllowlist[executor] = allowed;
+        emit ExecutorAllowlistUpdated(executor, allowed);
+    }
+
+    function requestFlashRoute(address asset, uint256 amount, RoutePlan calldata plan) external onlyOperator whenActive {
+        _validateRoute(asset, plan);
+        emit RouteRequested(plan.routeHash, asset, amount, plan.minProfit, plan.executor, msg.sender);
         pool.flashLoanSimple(address(this), asset, amount, abi.encode(plan), 0);
     }
 
@@ -63,16 +124,27 @@ contract FlashPoolBalancer {
         if (initiator != address(this)) revert InvalidInitiator();
 
         RoutePlan memory plan = abi.decode(params, (RoutePlan));
-        uint256 finalBalance = IFlashRouteExecutor(plan.executor).executeRoute(asset, amount, premium, plan.routeData);
+        _validateRoute(asset, plan);
+
+        uint256 reportedFinalBalance = IFlashRouteExecutor(plan.executor).executeRoute(asset, amount, premium, plan.routeData);
+        uint256 actualFinalBalance = IERC20(asset).balanceOf(address(this));
         uint256 requiredBalance = amount + premium + plan.minProfit;
-        if (finalBalance < requiredBalance) revert UnprofitableRoute(finalBalance, requiredBalance);
+        if (actualFinalBalance < requiredBalance) revert UnprofitableRoute(actualFinalBalance, requiredBalance);
 
         if (!IERC20(asset).approve(address(pool), amount + premium)) revert ApprovalFailed();
-        emit RouteSettled(asset, amount, premium, finalBalance - amount - premium);
+        emit RouteSettled(plan.routeHash, asset, amount, premium, actualFinalBalance - amount - premium, reportedFinalBalance, actualFinalBalance);
         return true;
     }
 
-    function rescueToken(address token, address to, uint256 amount) external onlyOwner {
+    function rescueToken(address token, address to, uint256 amount) external onlyAdmin {
+        if (token == address(0) || to == address(0)) revert InvalidAddress();
         IERC20(token).transfer(to, amount);
+    }
+
+    function _validateRoute(address asset, RoutePlan memory plan) internal view {
+        if (!assetAllowlist[asset]) revert AssetNotAllowed(asset);
+        if (!executorAllowlist[plan.executor]) revert ExecutorNotAllowed(plan.executor);
+        if (plan.deadline < block.timestamp) revert DeadlineExpired(plan.deadline, block.timestamp);
+        if (plan.routeHash == bytes32(0)) revert InvalidRouteHash();
     }
 }

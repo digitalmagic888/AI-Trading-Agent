@@ -1,28 +1,11 @@
 import http from "node:http";
-import { createSkillHubClient } from "../cmc/skillHubClient";
-import { normalizeSignal } from "../cmc/normalizeSignals";
 import { loadConfig } from "../config";
-import { defaultDemoQuotes, evaluateFlashOpportunity } from "../flash/opportunityEngine";
-import { getRun, listRuns, recordDecision } from "../ledger/sqlite";
-import { createStrategyDecision } from "../strategy/decisionEngine";
+import { getRun, listRuns } from "../ledger/sqlite";
+import { runDecision } from "../runtime/runDecision";
 
 function sendJson(res: http.ServerResponse, status: number, value: unknown): void {
   res.writeHead(status, { "content-type": "application/json", "access-control-allow-origin": "*" });
   res.end(JSON.stringify(value, null, 2));
-}
-
-async function runDecision() {
-  const config = loadConfig();
-  const client = createSkillHubClient(config);
-  const skills = await client.findSkill("crypto market overview");
-  const selected = skills[0];
-  if (!selected) throw new Error("No CMC skill candidate available.");
-  const result = await client.executeSkill(selected.uniqueName, { preview: true });
-  const signal = normalizeSignal(result);
-  const opportunity = evaluateFlashOpportunity({ quotes: defaultDemoQuotes(), amountUsd: 10_000, borrowAsset: "USDT", maxQuoteAgeMs: config.quoteStalenessMs });
-  const decision = createStrategyDecision(config, signal, opportunity);
-  recordDecision(config.dbPath, decision);
-  return decision;
 }
 
 export function createAgentServer() {

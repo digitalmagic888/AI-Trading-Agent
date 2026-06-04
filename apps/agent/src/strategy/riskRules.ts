@@ -4,6 +4,15 @@ function includesNormalized(values: string[], expected: string): boolean {
   return values.map((value) => value.toLowerCase()).includes(expected.toLowerCase());
 }
 
+function passesUsdCap(amountUsd: number, capUsd: number): boolean {
+  return capUsd <= 0 || amountUsd <= capUsd;
+}
+
+function capDetail(amountUsd: number, capName: string, capUsd: number): string {
+  if (capUsd <= 0) return `amountUsd=${amountUsd}, ${capName}=unbounded`;
+  return `amountUsd=${amountUsd}, ${capName}=${capUsd}`;
+}
+
 export function evaluateRiskGates(config: RuntimeConfig, signal: SignalSnapshot, opportunity: FlashOpportunity): RiskGate[] {
   const tokens = [opportunity.borrowAsset, "WBNB", "USDT"];
   const tokenAllowlistPassed = tokens.every((token) => includesNormalized(config.tokenAllowlist, token));
@@ -41,14 +50,14 @@ export function evaluateRiskGates(config: RuntimeConfig, signal: SignalSnapshot,
     },
     {
       name: "Trade notional cap",
-      passed: config.maxTradeUsd > 0 && opportunity.amountUsd <= config.maxTradeUsd,
-      detail: `amountUsd=${opportunity.amountUsd}, maxTradeUsd=${config.maxTradeUsd}`,
+      passed: passesUsdCap(opportunity.amountUsd, config.maxTradeUsd),
+      detail: capDetail(opportunity.amountUsd, "maxTradeUsd", config.maxTradeUsd),
       severity: "blocker"
     },
     {
       name: "Daily notional cap",
-      passed: config.maxDailyNotionalUsd > 0 && opportunity.amountUsd <= config.maxDailyNotionalUsd,
-      detail: `amountUsd=${opportunity.amountUsd}, maxDailyNotionalUsd=${config.maxDailyNotionalUsd}`,
+      passed: passesUsdCap(opportunity.amountUsd, config.maxDailyNotionalUsd),
+      detail: capDetail(opportunity.amountUsd, "maxDailyNotionalUsd", config.maxDailyNotionalUsd),
       severity: "blocker"
     },
     {

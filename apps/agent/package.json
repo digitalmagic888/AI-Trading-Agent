@@ -8,9 +8,15 @@
     "dev": "tsx watch src/index.ts",
     "demo:dry-run": "tsx src/demo/dryRun.ts",
     "demo:replay": "tsx src/demo/replay.ts",
+    "contracts:deploy": "tsx src/live/deployContracts.ts",
+    "wallet:fund-hot": "tsx src/live/fundHotWallet.ts",
+    "worker:once": "tsx src/live/executionWorker.ts --once",
+    "worker:run": "tsx src/live/executionWorker.ts",
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "ethers": "6.15.0",
+    "solc": "0.8.30"
+  }
 }
